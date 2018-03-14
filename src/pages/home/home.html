@@ -14,7 +14,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content >
   <h3>Ionic Menu Starter</h3>
 
   <p>
@@ -31,7 +31,7 @@
       <ion-col col-2 (click)="goToNextMonth()"><ion-icon name="arrow-forward"></ion-icon></ion-col>
     </ion-row>
   </div>
-  <div class="calendar-body">
+  <div class="calendar-body" (swipe) = "swipe($event)">
     <ion-grid>
       <ion-row class="calendar-weekday">
         <ion-col>Su</ion-col>
@@ -95,6 +95,57 @@
     </ion-item>
   </ion-list>
 
+  <div id="container1">
+      <div id="container2">
+      <ion-grid >
+        <ion-row nowrap style="
+        word-wrap: break-word;
+        height:20vw;
+        font-size:0.8em;
+        font-weight:300;
+        " >
+          <ion-col  *ngFor="let day of daysInThisMonth">Su</ion-col>
+          <ion-col *ngFor="let day of daysInThisMonth">Mo</ion-col>
+          <ion-col *ngFor="let day of daysInThisMonth">Tu</ion-col>
+          <ion-col *ngFor="let day of daysInThisMonth">We</ion-col>
+          <ion-col *ngFor="let day of daysInThisMonth">Th</ion-col>
+          <ion-col *ngFor="let day of daysInThisMonth">Fr</ion-col>
+          <ion-col *ngFor="let day of daysInThisMonth">Sa</ion-col>
+        </ion-row>
+
+      </ion-grid>
+    </div>
+  </div>
+
+  <ion-scroll scrollX="true" style="white-space: nowrap; height: 300px" >
+
+
+<!--
+    <img *ngFor="let i of items" src="../../assets/imgs/Please%20Stand%20By%20(2018)g.gif" (blur)="doInfinite($event)" (mouseover)="doInfinite($event)" alt=" asd ">-->
+
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+    <!--<img src="../../assets/imgs/Please%20Stand%20By%20(2018).gif">-->
+
+    <ion-infinite-scroll   (ionInfinite)="doInfinite($event)" distance="1%">
+      <ion-infinite-scroll-content>   </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ion-scroll>
+
+<!--
+
+
+  <ion-list>
+    <ion-item *ngFor="let i of items">{{i}}</ion-item>
+  </ion-list>
+-->
 
 
 

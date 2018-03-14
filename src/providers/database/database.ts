@@ -21,7 +21,7 @@ export class DatabaseProvider {
   private  databaseReady: BehaviorSubject<boolean>;
   constructor(public http: Http, private sqlitePorter: SQLitePorter, private storage: Storage, private sqlite: SQLite, private platform: Platform)//Aqui en el video ponen Http pq es otro import
   {
-    this.databaseReady = new BehaviorSubject(false);
+   /* this.databaseReady = new BehaviorSubject(false);
     this.platform.ready().then(() =>{
       this.sqlite.create({
         name: 'developers.db',
@@ -38,7 +38,7 @@ export class DatabaseProvider {
           }
         })
       });
-    });
+    });*/
   }
 
   fillDatabase(){

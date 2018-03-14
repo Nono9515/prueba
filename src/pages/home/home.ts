@@ -21,6 +21,7 @@ export class HomePage {
   currentYear: any;
   currentDate: any;
 
+  items = [];
   eventList: any;
   selectedEvent: any;
   isSelected: any;
@@ -45,14 +46,39 @@ export class HomePage {
 
 
 
-  this.databaseProvider.getDatabaseState().subscribe(rdy => {
+ /* this.databaseProvider.getDatabaseState().subscribe(rdy => {
       if(rdy){
         this.loadDeveloperData();
       }
     });
+*/
+    for (let i = 0; i < 10; i++) {
+      this.items.push( this.items.length);
+    }
 
   }
 
+  doInfinite(infiniteScroll) {
+    console.log('Begin async operation');
+
+    setTimeout(() => {
+      for (let i = 0; i < 300000; i++) {
+        this.items.push( this.items.length );
+      }
+
+      console.log('Async operation has ended');
+      // infiniteScroll.complete();
+    }, 500);
+  }
+
+swipe(event){
+    if(event.direction === 2){
+      this.goToNextMonth();
+    }
+  if(event.direction === 4){
+    this.goToLastMonth();
+  }
+}
 
 loadDeveloperData(){
   this.databaseProvider.getAllDevelopers().then(data => {
@@ -69,60 +95,80 @@ addDeveloper(){
 addDeveloperPrueba(){
   this.developers.push(this.developer);
 }
-  getDaysOfMonth() {
 
+
+  getDaysOfMonth() {
+    //  alert("DayOfMonth");
     this.daysInThisMonth = new Array();
     this.daysInLastMonth = new Array();
     this.daysInNextMonth = new Array();
 
     this.currentMonth = this.monthNames[this.date.getMonth()];
     this.currentYear = this.date.getFullYear();
-    if(this.date.getMonth() === new Date().getMonth()) {
-      this.currentDate = new Date().getDate();
-    } else {
-      this.currentDate = 999;
-    }
 
-    var firstDayThisMonth = new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
-    var prevNumOfDays = new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate();
-    for(var i = prevNumOfDays-(firstDayThisMonth-1); i <= prevNumOfDays; i++) {
-      this.daysInLastMonth.push(i);
-    }
 
-    var thisNumOfDays = new Date(this.date.getFullYear(), this.date.getMonth()+1, 0).getDate();
-    for (var j = 0; j < thisNumOfDays; j++) {
-      this.daysInThisMonth.push(j+1);
-    }
+    var firstDayThisMonth = this.date.getDate();
+    var lastDayThisMonth = new Date(this.date.getFullYear(), this.date.getMonth()+1, 0).getDate() ;
 
-    var lastDayThisMonth = new Date(this.date.getFullYear(), this.date.getMonth()+1, 0).getDay();
-   // var nextNumOfDays = new Date(this.date.getFullYear(), this.date.getMonth()+2, 0).getDate();
-    for (var k = 0; k < (6-lastDayThisMonth); k++) {
-      this.daysInNextMonth.push(k+1);
-    }
-    var totalDays = this.daysInLastMonth.length+this.daysInThisMonth.length+this.daysInNextMonth.length;
-    if(totalDays<36) {
-      for(var l = (7-lastDayThisMonth); l < ((7-lastDayThisMonth)+7); l++) {
-        this.daysInNextMonth.push(l);
+    var daysBefore = 20;
+    var daysAfter = 50;
+
+    var k = true;
+    for (var j = daysBefore; j >= 1; j--) {
+
+      if(firstDayThisMonth-j <= 0) {
+
+        if(firstDayThisMonth==2 && k) {
+          this.daysInThisMonth.push(new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate());
+          k=false;
+
+        } if(firstDayThisMonth==1 && k) {
+          this.daysInThisMonth.push(new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate()-1);
+          this.daysInThisMonth.push(new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate());
+          k=false;
+        }
       }
+
+      else
+        this.daysInThisMonth.push(firstDayThisMonth-(j));
+
     }
+
+    this.daysInThisMonth.push(firstDayThisMonth);
+
+    for (var h = 1; h <= daysAfter; h++) {
+
+      if(firstDayThisMonth+h > lastDayThisMonth)
+        this.daysInThisMonth.push(firstDayThisMonth+h-lastDayThisMonth);
+      else
+        this.daysInThisMonth.push(firstDayThisMonth+h);
+
+    }
+
+
   }
 
 
 
   goToLastMonth() {
-    console.log("LastMonth");
+    // console.log("LastMonth");
 
-    this.date = new Date(this.date.getFullYear(), this.date.getMonth(), 0);
+    this.date.setDate(this.date.getDate() - 1);
     this.getDaysOfMonth();
   }
+
+
+
+  goToNextMonth() {
+    this.date.setDate(this.date.getDate() + 1);
+    this.getDaysOfMonth();
+  }
+
+
+
 
   addEvent() {
     this.navCtrl.push(AddEventPage);
-  }
-
-  goToNextMonth() {
-    this.date = new Date(this.date.getFullYear(), this.date.getMonth()+2, 0);
-    this.getDaysOfMonth();
   }
 
   loadEventThisMonth() {
