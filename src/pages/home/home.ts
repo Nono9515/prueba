@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
+import {Content} from 'ionic-angular';
 import { NavController, AlertController } from 'ionic-angular';
 import { Calendar } from '@ionic-native/calendar';
 
@@ -6,22 +7,32 @@ import { AddEventPage } from '../add-event/add-event';
 
 import {DatabaseProvider} from "../../providers/database/database";
 
+import { NativePageTransitions, NativeTransitionOptions } from '@ionic-native/native-page-transitions';
+
+
+
+import {Gesture} from "ionic-angular";
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
+  @ViewChild(Content)
+  content:Content;
+
 
   date: any;
   daysInThisMonth: any;
   daysInLastMonth: any;
   daysInNextMonth: any;
   monthNames: string[];
+  weekDayNames: string[];
+  weekDayNamesDefault: string[];
   currentMonth: any;
   currentYear: any;
   currentDate: any;
 
-  items = [];
   eventList: any;
   selectedEvent: any;
   isSelected: any;
@@ -34,16 +45,25 @@ export class HomePage {
   developers = [];
   developer = {};
 
+  loaded:   boolean = false;
+  tabIndex: number  = 0;
+
+
+
   constructor(private alertCtrl: AlertController,
               public navCtrl: NavController,
               private calendar: Calendar,
-  private databaseProvider: DatabaseProvider) {
+              private databaseProvider: DatabaseProvider,
+              private nativePageTransitions: NativePageTransitions
+
+                                                                      ) {
     this.date = new Date();
     this.monthNames = ["Enero","Febrero","Marzo", "Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+    this.weekDayNames = ["Lu","Ma","Mi", "Ju","Vi","Sa","Do"];
+    this.weekDayNamesDefault = ["Do","Lu","Ma","Mi", "Ju","Vi","Sa"];
     this.getDaysOfMonth();
     this.eventList = new Array();
     // this.developers = new Array(this.persona);
-
 
 
  /* this.databaseProvider.getDatabaseState().subscribe(rdy => {
@@ -52,33 +72,50 @@ export class HomePage {
       }
     });
 */
-    for (let i = 0; i < 10; i++) {
-      this.items.push( this.items.length);
-    }
+
+  var cant = 7300;
+  this.daysInThisMonth = new Array();
+  this.weekDayNames = new Array();
+
+  for (let i = cant; i > 0; i--){
+    let fecha = new Date();
+    let f = new Date(fecha.setDate(fecha.getDate() - i))
+    this.daysInThisMonth.push(f);
+    this.weekDayNames.push(this.weekDayNamesDefault[f.getDay()]);
 
   }
 
-  doInfinite(infiniteScroll) {
-    console.log('Begin async operation');
 
-    setTimeout(() => {
-      for (let i = 0; i < 300000; i++) {
-        this.items.push( this.items.length );
-      }
+  for (let i = 0; i < cant ; i++){
+    let fecha = new Date();
+    let f = new Date(fecha.setDate(fecha.getDate() + i))
+    this.daysInThisMonth.push(f);
+    this.weekDayNames.push(this.weekDayNamesDefault[f.getDay()]);
 
-      console.log('Async operation has ended');
-      // infiniteScroll.complete();
-    }, 500);
+
   }
 
-swipe(event){
-    if(event.direction === 2){
-      this.goToNextMonth();
-    }
-  if(event.direction === 4){
-    this.goToLastMonth();
+
+   // let g =  new Date();
+   //  g.setDate(g.getDate()+2);
+   //  $(document).ready(function(){
+   //   window.location.href = '#'+g.getDate()+'-'+g.getMonth()+'-'+g.getFullYear();
+   //
+   //  });
+
+    // var element = angular.element(document.querySelector('#col_days'));
+    //
+    // $ionicGesture.on('tap', function(e){
+    //   $scope.$apply(function() {
+    //     console.log('Tap');
+    //     $scope.gesture.used = 'Tap';
+    //   })
+    // }, element);
+
+
   }
-}
+
+
 
 loadDeveloperData(){
   this.databaseProvider.getAllDevelopers().then(data => {
@@ -103,6 +140,8 @@ addDeveloperPrueba(){
     this.daysInLastMonth = new Array();
     this.daysInNextMonth = new Array();
 
+    this.weekDayNames = new Array();
+
     this.currentMonth = this.monthNames[this.date.getMonth()];
     this.currentYear = this.date.getFullYear();
 
@@ -110,8 +149,8 @@ addDeveloperPrueba(){
     var firstDayThisMonth = this.date.getDate();
     var lastDayThisMonth = new Date(this.date.getFullYear(), this.date.getMonth()+1, 0).getDate() ;
 
-    var daysBefore = 20;
-    var daysAfter = 50;
+    var daysBefore = 40;
+    var daysAfter = 40;
 
     var k = true;
     for (var j = daysBefore; j >= 1; j--) {
@@ -127,22 +166,56 @@ addDeveloperPrueba(){
           this.daysInThisMonth.push(new Date(this.date.getFullYear(), this.date.getMonth(), 0).getDate());
           k=false;
         }
+        this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay() - (j)]);
+
       }
 
-      else
-        this.daysInThisMonth.push(firstDayThisMonth-(j));
+      else {
+
+        this.daysInThisMonth.push(firstDayThisMonth - (j));
+
+        if(this.date.getDay() - (j) < 0 ){
+          this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay() + 7-(j)]);
+
+        }
+        else {
+          this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay() - (j)]);
+
+
+        }
+
+      }
 
     }
 
     this.daysInThisMonth.push(firstDayThisMonth);
+    this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay()]);
 
     for (var h = 1; h <= daysAfter; h++) {
 
-      if(firstDayThisMonth+h > lastDayThisMonth)
-        this.daysInThisMonth.push(firstDayThisMonth+h-lastDayThisMonth);
-      else
-        this.daysInThisMonth.push(firstDayThisMonth+h);
+      if(firstDayThisMonth+h > lastDayThisMonth){ //Fin de mes
+        this.daysInThisMonth.push(firstDayThisMonth +h-lastDayThisMonth);
+          if(h+this.date.getDay()>6){ //Cuando llegue al final, iniciar desde el sabado
+           this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay() -(7-h)]);
 
+          }
+          else {
+            this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay() + (h)]);
+          }
+
+      }
+      else {
+        this.daysInThisMonth.push(firstDayThisMonth + h);
+
+        if( this.date.getDay()+ h > 6){
+        this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay()+ (h-7)]);
+
+        }
+        else{
+          this.weekDayNames.push(this.weekDayNamesDefault[this.date.getDay()+ h]);
+
+        }
+      }
     }
 
 
@@ -153,14 +226,14 @@ addDeveloperPrueba(){
   goToLastMonth() {
     // console.log("LastMonth");
 
-    this.date.setDate(this.date.getDate() - 1);
+    this.date.setDate(this.date.getDate() - 5);
     this.getDaysOfMonth();
   }
 
 
 
   goToNextMonth() {
-    this.date.setDate(this.date.getDate() + 1);
+    this.date.setDate(this.date.getDate() + 5);
     this.getDaysOfMonth();
   }
 
@@ -243,4 +316,64 @@ addDeveloperPrueba(){
     });
     alert.present();
   }
+
+  swipe(event) {
+    if(event.direction === 2) {
+        this.goToNextMonth()
+    }
+    if(event.direction === 4) {
+        this.goToLastMonth()
+    }
+  }
+
+
+  private getAnimationDirection(index):string {
+    var currentIndex = this.tabIndex;
+
+    this.tabIndex = index;
+
+    switch (true){
+      case (currentIndex < index):
+        return('left');
+      case (currentIndex > index):
+        return ('right');
+    }
+  }
+
+  public transition(e):void {
+  alert(e);
+    let options: NativeTransitionOptions = {
+      direction:this.getAnimationDirection(e.index),
+      duration: 250,
+      slowdownfactor: -1,
+      slidePixels: 0,
+      iosdelay: 20,
+      androiddelay: 0,
+      fixedPixelsTop: 0,
+      fixedPixelsBottom: 48
+    };
+
+    if (!this.loaded) {
+      this.loaded = true;
+      return;
+    }
+
+    this.nativePageTransitions.slide(options);
+  }
+
+  asda(e){
+  alert(e.type);
+
+  }
+  asd(dayA,e){
+  console.log(e);
+    this.currentMonth = this.monthNames[dayA.getMonth()];
+    this.currentYear = dayA.getFullYear();
+  }
+
+  // fireEvent(){
+  //   console.log("hola");
+  // }
+
+
 }
