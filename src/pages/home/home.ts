@@ -7,11 +7,10 @@ import { AddEventPage } from '../add-event/add-event';
 
 import {DatabaseProvider} from "../../providers/database/database";
 
-import { NativePageTransitions, NativeTransitionOptions } from '@ionic-native/native-page-transitions';
+import {  NativeTransitionOptions } from '@ionic-native/native-page-transitions';
 
 
 
-import {Gesture} from "ionic-angular";
 
 @Component({
   selector: 'page-home',
@@ -21,6 +20,7 @@ export class HomePage {
   @ViewChild(Content)
   content:Content;
 
+  items = [];
 
   date: any;
   daysInThisMonth: any;
@@ -54,7 +54,6 @@ export class HomePage {
               public navCtrl: NavController,
               private calendar: Calendar,
               private databaseProvider: DatabaseProvider,
-              private nativePageTransitions: NativePageTransitions
 
                                                                       ) {
     this.date = new Date();
@@ -340,26 +339,7 @@ addDeveloperPrueba(){
     }
   }
 
-  public transition(e):void {
-  alert(e);
-    let options: NativeTransitionOptions = {
-      direction:this.getAnimationDirection(e.index),
-      duration: 250,
-      slowdownfactor: -1,
-      slidePixels: 0,
-      iosdelay: 20,
-      androiddelay: 0,
-      fixedPixelsTop: 0,
-      fixedPixelsBottom: 48
-    };
 
-    if (!this.loaded) {
-      this.loaded = true;
-      return;
-    }
-
-    this.nativePageTransitions.slide(options);
-  }
 
   asda(e){
   alert(e.type);
@@ -374,6 +354,18 @@ addDeveloperPrueba(){
   // fireEvent(){
   //   console.log("hola");
   // }
+  doInfinite(infiniteScroll) {
+    console.log('Begin async operation');
+
+    setTimeout(() => {
+      for (let i = 0; i < 300000; i++) {
+        this.items.push( this.items.length );
+      }
+
+      console.log('Async operation has ended');
+      // infiniteScroll.complete();
+    }, 500);
+  }
 
 
 }
